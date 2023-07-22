@@ -46,7 +46,6 @@
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
         var markdownSection = document.querySelector('.markdown-section');
-        var popup = null;
 
         // Plugin to display images in the page content when clicking on the link
         markdownSection.addEventListener('click', function(e) {
@@ -74,7 +73,7 @@
           }
         });
 
-        // Plugin to display footnotes in popup on hover
+        // Plugin to display footnotes inline on hover
         markdownSection.addEventListener('mouseover', function(e) {
           var target = e.target;
           if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:')) {
@@ -82,26 +81,8 @@
             var footnoteContentElement = document.getElementById(footnoteId);
             if (footnoteContentElement) {
               var footnoteContent = footnoteContentElement.innerHTML;
-              popup = document.createElement('div');
-              popup.style.position = 'fixed';
-              popup.style.left = e.clientX + 'px';
-              popup.style.top = (e.clientY + 10) + 'px';
-              popup.style.background = '#fff';
-              popup.style.padding = '10px';
-              popup.style.maxWidth = '300px';
-              popup.style.border = '1px solid #000';
-              popup.style.zIndex = '1000';
-              popup.innerHTML = footnoteContent;
-              document.body.appendChild(popup);
+              target.setAttribute('title', footnoteContent);
             }
-          }
-        });
-
-        markdownSection.addEventListener('mouseout', function(e) {
-          var target = e.target;
-          if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:') && popup) {
-            document.body.removeChild(popup);
-            popup = null;
           }
         });
       });
