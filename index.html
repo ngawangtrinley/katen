@@ -49,27 +49,31 @@
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
         // Your previous code for image display...
-      });
 
-      hook.mounted(function() {
-        function highlightKeyword() {
-          var keyword = vm.route.query.s;
-          if (keyword) {
-            var instance = new Mark('.markdown-section');
-            instance.unmark();  // remove previous highlights
-            instance.mark(keyword);  // highlight the search keyword
-          }
-        }
-
-        // Add click event listener to the sidebar
-        var sidebar = document.querySelector('.sidebar');
-        if (sidebar) {
-          sidebar.addEventListener('click', function(e) {
-            if (e.target.matches('.results li')) {
-              // If a search result is clicked, wait for the new page to load, then highlight
-              setTimeout(highlightKeyword, 500);
+        var searchResultObserver = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.target.style.display !== 'none') {
+              var searchResultLinks = document.querySelectorAll('.results li a');
+              searchResultLinks.forEach(function(link) {
+                link.addEventListener('click', function() {
+                  setTimeout(function() {
+                    var keyword = vm.route.query.s;
+                    if (keyword) {
+                      var instance = new Mark('.markdown-section');
+                      instance.unmark();
+                      instance.mark(keyword);
+                    }
+                  }, 500);
+                });
+              });
             }
           });
+        });
+
+        var config = { attributes: true };
+        var targetNode = document.querySelector('.results');
+        if (targetNode) {
+          searchResultObserver.observe(targetNode, config);
         }
       });
 
