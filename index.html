@@ -61,13 +61,14 @@
           }
         }
 
-        // Hook into search input event
-        var searchInput = document.querySelector('.search input[type="text"]');
-        if (searchInput) {
-          searchInput.addEventListener('input', function() {
-            // Wait 1 second after the user finished typing, then highlight
-            clearTimeout(window.highlightTimeout);
-            window.highlightTimeout = setTimeout(highlightKeyword, 1000);
+        // Add click event listener to the sidebar
+        var sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+          sidebar.addEventListener('click', function(e) {
+            if (e.target.matches('.results li')) {
+              // If a search result is clicked, wait for the new page to load, then highlight
+              setTimeout(highlightKeyword, 100);
+            }
           });
         }
       });
