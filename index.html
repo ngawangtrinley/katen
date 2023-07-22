@@ -13,6 +13,9 @@
     .markdown-section {
       max-width: 2000px !important; /* Change this to adjust the maximum width */
     }
+    .search-keyword {
+        background-color: yellow; /* Highlight color for search keyword */
+    }
   </style>
 
   <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
@@ -21,7 +24,7 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: 'Just Kangyur',
+      name: 'Tibetan Fonts',
       repo: 'https://github.com/ngawangtrinley/katen',
       coverpage: false,
       loadSidebar: true,
@@ -35,45 +38,58 @@
       ga: 'UA-145106145-1',
 
       search: {
-      maxAge: 86400000, // Expiration time, the default one day
-      paths: 'auto', // or 'auto'
-      placeholder: 'Type to search',
-      hideOtherSidebarContent: true,
-      depth: 6},
+        maxAge: 86400000, // Expiration time, the default one day
+        paths: 'auto', // or 'auto'
+        placeholder: 'Type to search',
+        hideOtherSidebarContent: true,
+        depth: 6
+      },
 
       plugins: [EditOnGithubPlugin.create('https://github.com/ngawangtrinley/katen/blob/main/')],
     }
 
-    // Add your custom plugin code here
-    window.$docsify.plugins = [].concat(function (hook, vm) {
-      hook.doneEach(function() {
-        var markdownSection = document.querySelector('.markdown-section');
-        markdownSection.addEventListener('click', function(e) {
-          var target = e.target;
-          if (target.tagName === 'A') {
-            var href = target.getAttribute('href');
+    // Plugin to highlight search keywords
+    window.$docsify.plugins = [].concat(function(hook, vm) {
+      var KEYWORD_HIGHLIGHT_CLASS = 'search-keyword';  // The CSS class to apply to highlighted keywords
+      var keyword = '';
 
-            if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
-              e.preventDefault();
-
-              // Check if image div already exists
-              var nextSibling = target.nextSibling;
-              if (nextSibling && nextSibling.classList && nextSibling.classList.contains('injected-img')) {
-                // If the image div already exists, remove it (toggle behavior)
-                nextSibling.remove();
-              } else {
-                // Otherwise, create the image div and insert it after the link
-                var div = document.createElement('div');
-                div.classList.add('injected-img');
-                div.style.margin = '10px 0';
-                div.innerHTML = '<img src="' + href + '" style="max-width: 100%;">';
-                target.parentNode.insertBefore(div, target.nextSibling);
-              }
-            }
-          }
+      // Function to remove previous highlights
+      function removePreviousHighlights() {
+        var previouslyHighlighted = Array.from(document.getElementsByClassName(KEYWORD_HIGHLIGHT_CLASS));
+        previouslyHighlighted.forEach(function(element) {
+          // Replace the highlighted element with its own contents (i.e., remove the highlight)
+          element.replaceWith(...element.childNodes);
         });
+      }
+
+      // Function to highlight keyword in content
+      function highlightKeywordInContent() {
+        var contentElements = Array.from(document.getElementsByClassName('content'));
+        var regex = new RegExp('('+keyword+')', 'gi');
+        contentElements.forEach(function(element) {
+          element.innerHTML = element.innerHTML.replace(regex, '<span class="'+KEYWORD_HIGHLIGHT_CLASS+'">$1</span>');
+        });
+      }
+
+      // Hook to get the search keyword when a search is performed
+      hook.doneEach(function() {
+        removePreviousHighlights();
+        if (keyword) {
+          highlightKeywordInContent();
+        }
+      });
+
+      hook.init(function() {
+        keyword = '';
+      });
+
+      // Set the keyword whenever a search is performed
+      hook.beforeEach(function(content, next) {
+        keyword = window.Docsify.dom.getNode('#search_input').value;
+        next(content);
       });
     }, window.$docsify.plugins);
+
   </script>
 
   <script src="//unpkg.com/docsify-copy-code"></script>
@@ -84,7 +100,5 @@
   <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
   <!-- plugins -->
   <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
-
-
 </body>
 </html>
