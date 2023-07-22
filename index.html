@@ -82,17 +82,16 @@
         if (searchBar) {
           searchBar.addEventListener('input', function () {
             keyword = this.value;
+            // Delay the keyword highlighting so it runs after search plugin
+            window.setTimeout(function () {
+              removePreviousHighlights();
+              if (keyword) {
+                highlightKeywordInContent();
+              }
+            }, 500); // You can adjust this delay as per your requirement
           });
         }
       });
-
-      hook.afterRender(function () {
-        removePreviousHighlights();
-        if (keyword) {
-          highlightKeywordInContent();
-        }
-      });
-
     }, window.$docsify.plugins || []);
 
 
