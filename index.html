@@ -36,44 +36,33 @@
       ga: 'UA-145106145-1',
 
       search: {
-      maxAge: 86400000, // Expiration time, the default one day
-      paths: 'auto', // or 'auto'
-      placeholder: 'Type to search',
-      hideOtherSidebarContent: true,
-      depth: 6},
+        maxAge: 86400000, // Expiration time, the default one day
+        paths: 'auto', // or 'auto'
+        placeholder: 'Type to search',
+        hideOtherSidebarContent: true,
+        depth: 6
+      },
 
       plugins: [EditOnGithubPlugin.create('https://github.com/ngawangtrinley/katen/blob/main/')],
     }
 
-    // Add your custom plugin code here
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
-        var markdownSection = document.querySelector('.markdown-section');
-        markdownSection.addEventListener('click', function(e) {
-          var target = e.target;
-          if (target.tagName === 'A') {
-            var href = target.getAttribute('href');
-
-            if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
-              e.preventDefault();
-
-              // Check if image div already exists
-              var nextSibling = target.nextSibling;
-              if (nextSibling && nextSibling.classList && nextSibling.classList.contains('injected-img')) {
-                // If the image div already exists, remove it (toggle behavior)
-                nextSibling.remove();
-              } else {
-                // Otherwise, create the image div and insert it after the link
-                var div = document.createElement('div');
-                div.classList.add('injected-img');
-                div.style.margin = '10px 0';
-                div.innerHTML = '<img src="' + href + '" style="max-width: 100%;">';
-                target.parentNode.insertBefore(div, target.nextSibling);
-              }
-            }
-          }
-        });
+        // Your previous code for image display...
       });
+      
+      hook.afterEach(function(html, next) {
+        setTimeout(function() {
+          var keyword = vm.route.query.s;
+          if (keyword) {
+            var instance = new Mark('.markdown-section');
+            instance.unmark();  // remove previous highlights
+            instance.mark(keyword);  // highlight the search keyword
+          }
+          next(html);
+        }, 0);
+      });
+
     }, window.$docsify.plugins);
   </script>
 
@@ -89,5 +78,3 @@
 
 </body>
 </html>
-
-
