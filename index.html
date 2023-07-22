@@ -21,7 +21,7 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: 'Katen',
+      name: 'Derge Katen',
       repo: 'https://github.com/ngawangtrinley/katen',
       coverpage: false,
       loadSidebar: true,
@@ -48,6 +48,34 @@
       hook.doneEach(function() {
         var markdownSection = document.querySelector('.markdown-section');
         var popup = null;
+
+        // Existing Plugin
+        markdownSection.addEventListener('click', function(e) {
+          var target = e.target;
+          if (target.tagName === 'A') {
+            var href = target.getAttribute('href');
+
+            if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
+              e.preventDefault();
+
+              // Check if image div already exists
+              var nextSibling = target.nextSibling;
+              if (nextSibling && nextSibling.classList && nextSibling.classList.contains('injected-img')) {
+                // If the image div already exists, remove it (toggle behavior)
+                nextSibling.remove();
+              } else {
+                // Otherwise, create the image div and insert it after the link
+                var div = document.createElement('div');
+                div.classList.add('injected-img');
+                div.style.margin = '10px 0';
+                div.innerHTML = '<img src="' + href + '" style="max-width: 100%;">';
+                target.parentNode.insertBefore(div, target.nextSibling);
+              }
+            }
+          }
+        });
+
+        // Footnote Tooltip Plugin
         markdownSection.addEventListener('mouseenter', function(e) {
           var target = e.target;
           if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:')) {
