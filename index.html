@@ -49,47 +49,48 @@
     }
 
     // Plugin to highlight search keywords
-    window.$docsify.plugins = [].concat(function(hook, vm) {
-      var KEYWORD_HIGHLIGHT_CLASS = 'search-keyword';  // The CSS class to apply to highlighted keywords
-      var keyword = '';
+    window.$docsify.plugins = [].concat(function (hook, vm) {
+        var KEYWORD_HIGHLIGHT_CLASS = 'search-keyword';  // The CSS class to apply to highlighted keywords
+        var keyword = '';
 
-      // Function to remove previous highlights
-      function removePreviousHighlights() {
-        var previouslyHighlighted = Array.from(document.getElementsByClassName(KEYWORD_HIGHLIGHT_CLASS));
-        previouslyHighlighted.forEach(function(element) {
-          // Replace the highlighted element with its own contents (i.e., remove the highlight)
-          element.replaceWith(...element.childNodes);
-        });
-      }
-
-      // Function to highlight keyword in content
-      function highlightKeywordInContent() {
-        var contentElements = Array.from(document.getElementsByClassName('content'));
-        var regex = new RegExp('('+keyword+')', 'gi');
-        contentElements.forEach(function(element) {
-          element.innerHTML = element.innerHTML.replace(regex, '<span class="'+KEYWORD_HIGHLIGHT_CLASS+'">$1</span>');
-        });
-      }
-
-      // Hook to get the search keyword when a search is performed
-      hook.doneEach(function() {
-        removePreviousHighlights();
-        if (keyword) {
-          highlightKeywordInContent();
+        // Function to remove previous highlights
+        function removePreviousHighlights() {
+            var previouslyHighlighted = Array.from(document.getElementsByClassName(KEYWORD_HIGHLIGHT_CLASS));
+            previouslyHighlighted.forEach(function (element) {
+                // Replace the highlighted element with its own contents (i.e., remove the highlight)
+                element.replaceWith(...element.childNodes);
+            });
         }
-      });
 
-      hook.init(function() {
-        keyword = '';
-      });
+        // Function to highlight keyword in content
+        function highlightKeywordInContent() {
+            var contentElements = Array.from(document.querySelectorAll('.markdown-section'));
+            var regex = new RegExp('('+keyword+')', 'gi');
+            contentElements.forEach(function (element) {
+                element.innerHTML = element.innerHTML.replace(regex, '<span class="'+KEYWORD_HIGHLIGHT_CLASS+'">$1</span>');
+            });
+        }
 
-      // Set the keyword whenever a search is performed
-      hook.beforeEach(function(content, next) {
-        keyword = window.Docsify.dom.getNode('#search_input').value;
-        next(content);
-      });
-    }, window.$docsify.plugins);
+        hook.afterEach(function (html, next) {
+            if (keyword) {
+                var regex = new RegExp('('+keyword+')', 'gi');
+                html = html.replace(regex, '<span class="'+KEYWORD_HIGHLIGHT_CLASS+'">$1</span>');
+            }
+            next(html);
+        });
 
+        hook.doneEach(function () {
+            var searchBar = document.querySelector('.search input[type="text"]');
+            if (searchBar) {
+                searchBar.addEventListener('change', function () {
+                    removePreviousHighlights();
+                    keyword = this.value;
+                    highlightKeywordInContent();
+                });
+            }
+        });
+    }, window.$docsify.plugins || []);
+    
   </script>
 
   <script src="//unpkg.com/docsify-copy-code"></script>
