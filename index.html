@@ -43,7 +43,6 @@
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
         var allImages = Array.prototype.slice.call(document.querySelectorAll('.markdown-section img'));
-        var allLinks = Array.prototype.slice.call(document.querySelectorAll('.markdown-section a'));
 
         allImages.forEach(function(img) {
           img.style.cursor = 'zoom-in';
@@ -56,17 +55,19 @@
           });
         });
 
-        allLinks.forEach(function(link) {
-          var href = link.getAttribute('href');
+        var markdownSection = document.querySelector('.markdown-section');
+        markdownSection.addEventListener('click', function(e) {
+          var target = e.target;
+          if (target.tagName === 'A') {
+            var href = target.getAttribute('href');
 
-          if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
-            link.addEventListener('click', function(e) {
+            if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
               e.preventDefault();
               $.featherlight('<img src="' + href + '">', {
                 closeIcon: '',
                 type: 'html'
               });
-            });
+            }
           }
         });
       });
