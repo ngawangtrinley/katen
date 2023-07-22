@@ -1,55 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Docsify Site</title>
+  <meta charset="UTF-8">
+  <title>OpenPecha development guidelines</title>
+  <!-- <link rel="icon" href="_assets/favicon.ico"> -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+  <link href="https://cdn.rawgit.com/noelboss/featherlight/1.7.13/release/featherlight.min.css" type="text/css" rel="stylesheet" />
 
-    <!-- Include Docsify -->
-    <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      name: 'Tibetan Fonts',
+      repo: 'https://github.com/ngawangtrinley/katen',
+      coverpage: false,
+      loadSidebar: true,
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md',
+      },
+      subMaxLevel: 3,
+      auto2top: true,
+      // logo: '/_assets/logo.png',
+      themeColor: '#8e57f1',
+      ga: 'UA-145106145-1',
 
-    <!-- Include Featherlight -->
-    <link href="https://cdn.rawgit.com/noelboss/featherlight/1.7.13/release/featherlight.min.css" type="text/css" rel="stylesheet" />
-    <script src="https://cdn.rawgit.com/noelboss/featherlight/1.7.13/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+      search: {
+      maxAge: 86400000, // Expiration time, the default one day
+      paths: 'auto', // or 'auto'
+      placeholder: 'Type to search',
+      hideOtherSidebarContent: true,
+      depth: 6},
 
-    <!-- Include your custom Docsify plugin -->
-    <script>
-      window.$docsify.plugins = [].concat(installImagePopup, window.$docsify.plugins);
+      plugins: [EditOnGithubPlugin.create('https://github.com/ngawangtrinley/katen/blob/main/')],
+    }
 
-      function installImagePopup(hook, vm) {
-        hook.doneEach(function() {
-          var allImages = Array.prototype.slice.call(document.querySelectorAll('.markdown-section img'));
-          var allLinks = Array.prototype.slice.call(document.querySelectorAll('.markdown-section a'));
+    // Add your custom plugin code here
+    window.$docsify.plugins = [].concat(function (hook, vm) {
+      hook.doneEach(function() {
+        var allImages = Array.prototype.slice.call(document.querySelectorAll('.markdown-section img'));
+        var allLinks = Array.prototype.slice.call(document.querySelectorAll('.markdown-section a'));
 
-          allImages.forEach(function(img) {
-            img.style.cursor = 'zoom-in';
+        allImages.forEach(function(img) {
+          img.style.cursor = 'zoom-in';
 
-            img.addEventListener('click', function() {
-              $.featherlight('<img src="' + img.src + '">', {
+          img.addEventListener('click', function() {
+            $.featherlight('<img src="' + img.src + '">', {
+              closeIcon: '',
+              type: 'html'
+            });
+          });
+        });
+
+        allLinks.forEach(function(link) {
+          var href = link.getAttribute('href');
+
+          if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
+            link.addEventListener('click', function(e) {
+              e.preventDefault();
+              $.featherlight('<img src="' + href + '">', {
                 closeIcon: '',
                 type: 'html'
               });
             });
-          });
-
-          allLinks.forEach(function(link) {
-            var href = link.getAttribute('href');
-
-            if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
-              link.addEventListener('click', function(e) {
-                e.preventDefault();
-                $.featherlight('<img src="' + href + '">', {
-                  closeIcon: '',
-                  type: 'html'
-                });
-              });
-            }
-          });
+          }
         });
-      }
-    </script>
-</head>
-<body>
-    <div id="app"></div>
+      });
+    }, window.$docsify.plugins);
+  </script>
+
+  <script src="//unpkg.com/docsify-copy-code"></script>
+  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+  <script src="https://cdn.rawgit.com/noelboss/featherlight/1.7.13/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/ga.min.js"></script>
+  <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/prismjs/components/prism-python.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <!-- plugins -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
+
+
 </body>
 </html>
