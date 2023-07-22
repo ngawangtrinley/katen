@@ -50,17 +50,26 @@
       hook.doneEach(function() {
         // Your previous code for image display...
       });
-      
-      hook.afterEach(function(html, next) {
-        setTimeout(function() {
+
+      hook.mounted(function() {
+        function highlightKeyword() {
           var keyword = vm.route.query.s;
           if (keyword) {
             var instance = new Mark('.markdown-section');
             instance.unmark();  // remove previous highlights
             instance.mark(keyword);  // highlight the search keyword
           }
-          next(html);
-        }, 0);
+        }
+
+        // Hook into search input event
+        var searchInput = document.querySelector('.search input[type="text"]');
+        if (searchInput) {
+          searchInput.addEventListener('input', function() {
+            // Wait 1 second after the user finished typing, then highlight
+            clearTimeout(window.highlightTimeout);
+            window.highlightTimeout = setTimeout(highlightKeyword, 1000);
+          });
+        }
       });
 
     }, window.$docsify.plugins);
