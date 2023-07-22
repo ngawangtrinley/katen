@@ -11,18 +11,17 @@
 
   <style>
     .markdown-section {
-      max-width: 2000px !important; /* Change this to adjust the maximum width */
+      max-width: 1200px !important; /* Change this to adjust the maximum width */
     }
   </style>
 
   <script src="//unpkg.com/docsify-edit-on-github/index.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"></script>
 </head>
 <body>
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: 'Tibetan Fonts',
+      name: 'Just Kangyur',
       repo: 'https://github.com/ngawangtrinley/katen',
       coverpage: false,
       loadSidebar: true,
@@ -36,42 +35,44 @@
       ga: 'UA-145106145-1',
 
       search: {
-        maxAge: 86400000, // Expiration time, the default one day
-        paths: 'auto', // or 'auto'
-        placeholder: 'Type to search',
-        hideOtherSidebarContent: true,
-        depth: 6
-      },
+      maxAge: 86400000, // Expiration time, the default one day
+      paths: 'auto', // or 'auto'
+      placeholder: 'Type to search',
+      hideOtherSidebarContent: true,
+      depth: 6},
 
       plugins: [EditOnGithubPlugin.create('https://github.com/ngawangtrinley/katen/blob/main/')],
     }
 
+    // Add your custom plugin code here
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
-        // Your previous code for image display...
-      });
+        var markdownSection = document.querySelector('.markdown-section');
+        markdownSection.addEventListener('click', function(e) {
+          var target = e.target;
+          if (target.tagName === 'A') {
+            var href = target.getAttribute('href');
 
-      hook.ready(function() {
-        // Save original jump function
-        const originalJump = Docsify.dom.jump;
+            if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
+              e.preventDefault();
 
-        // Override jump function
-        Docsify.dom.jump = function(path, router) {
-          // Call original jump function
-          originalJump.call(this, path, router);
-
-          // Wait for the new page to load, then highlight
-          setTimeout(() => {
-            var keyword = vm.route.query.s;
-            if (keyword) {
-              var instance = new Mark('.markdown-section');
-              instance.unmark();  // remove previous highlights
-              instance.mark(keyword);  // highlight the search keyword
+              // Check if image div already exists
+              var nextSibling = target.nextSibling;
+              if (nextSibling && nextSibling.classList && nextSibling.classList.contains('injected-img')) {
+                // If the image div already exists, remove it (toggle behavior)
+                nextSibling.remove();
+              } else {
+                // Otherwise, create the image div and insert it after the link
+                var div = document.createElement('div');
+                div.classList.add('injected-img');
+                div.style.margin = '10px 0';
+                div.innerHTML = '<img src="' + href + '" style="max-width: 100%;">';
+                target.parentNode.insertBefore(div, target.nextSibling);
+              }
             }
-          }, 100);
-        };
+          }
+        });
       });
-
     }, window.$docsify.plugins);
   </script>
 
@@ -83,6 +84,7 @@
   <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
   <!-- plugins -->
   <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
+
 
 </body>
 </html>
