@@ -16,7 +16,7 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
-      name: 'Tibetan Fonts',
+      name: 'Just Katen',
       repo: 'https://github.com/ngawangtrinley/katen',
       coverpage: false,
       loadSidebar: true,
@@ -52,6 +52,45 @@
   <!-- plugins -->
   <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
 
+  <link href="https://cdn.rawgit.com/noelboss/featherlight/1.7.13/release/featherlight.min.css" type="text/css" rel="stylesheet" />
+  <script src="https://cdn.rawgit.com/noelboss/featherlight/1.7.13/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+window.$docsify.plugins = [].concat(installImagePopup, window.$docsify.plugins);
+
+function installImagePopup(hook, vm) {
+  hook.doneEach(function() {
+    var allImages = Array.prototype.slice.call(document.querySelectorAll('.markdown-section img'));
+    var allLinks = Array.prototype.slice.call(document.querySelectorAll('.markdown-section a'));
+
+    allImages.forEach(function(img) {
+      img.style.cursor = 'zoom-in';
+
+      img.addEventListener('click', function() {
+        $.featherlight('<img src="' + img.src + '">', {
+          closeIcon: '',
+          type: 'html'
+        });
+      });
+    });
+
+    allLinks.forEach(function(link) {
+      var href = link.getAttribute('href');
+
+      if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          $.featherlight('<img src="' + href + '">', {
+            closeIcon: '',
+            type: 'html'
+          });
+        });
+      }
+    });
+  });
+}
+
+
+  
+  
 
 </body>
 </html>
