@@ -49,32 +49,27 @@
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
         // Your previous code for image display...
+      });
 
-        var searchResultObserver = new MutationObserver(function(mutations) {
-          mutations.forEach(function(mutation) {
-            if (mutation.target.style.display !== 'none') {
-              var searchResultLinks = document.querySelectorAll('.results li a');
-              searchResultLinks.forEach(function(link) {
-                link.addEventListener('click', function() {
-                  setTimeout(function() {
-                    var keyword = vm.route.query.s;
-                    if (keyword) {
-                      var instance = new Mark('.markdown-section');
-                      instance.unmark();
-                      instance.mark(keyword);
-                    }
-                  }, 500);
-                });
-              });
+      hook.ready(function() {
+        // Save original jump function
+        const originalJump = Docsify.dom.jump;
+
+        // Override jump function
+        Docsify.dom.jump = function(path, router) {
+          // Call original jump function
+          originalJump.call(this, path, router);
+
+          // Wait for the new page to load, then highlight
+          setTimeout(() => {
+            var keyword = vm.route.query.s;
+            if (keyword) {
+              var instance = new Mark('.markdown-section');
+              instance.unmark();  // remove previous highlights
+              instance.mark(keyword);  // highlight the search keyword
             }
-          });
-        });
-
-        var config = { attributes: true };
-        var targetNode = document.querySelector('.results');
-        if (targetNode) {
-          searchResultObserver.observe(targetNode, config);
-        }
+          }, 100);
+        };
       });
 
     }, window.$docsify.plugins);
@@ -88,7 +83,6 @@
   <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
   <!-- plugins -->
   <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
-
 
 </body>
 </html>
