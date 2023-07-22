@@ -33,12 +33,11 @@
       ga: 'UA-145106145-1',
 
       search: {
-        maxAge: 86400000, // Expiration time, the default one day
-        paths: 'auto', // or 'auto'
-        placeholder: 'Type to search',
-        hideOtherSidebarContent: true,
-        depth: 6
-      },
+      maxAge: 86400000, // Expiration time, the default one day
+      paths: 'auto', // or 'auto'
+      placeholder: 'Type to search',
+      hideOtherSidebarContent: true,
+      depth: 6},
 
       plugins: [EditOnGithubPlugin.create('https://github.com/ngawangtrinley/katen/blob/main/')],
     }
@@ -46,58 +45,41 @@
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
         var markdownSection = document.querySelector('.markdown-section');
-        var footnote = null;
+        var popup = null;
 
-        // Plugin to display images in the page content when clicking on the link
-        markdownSection.addEventListener('click', function(e) {
-          var target = e.target;
-          if (target.tagName === 'A') {
-            var href = target.getAttribute('href');
-
-            if (href.startsWith('http') && (href.endsWith('.png') || href.endsWith('.jpg') || href.endsWith('.jpeg') || href.endsWith('.gif'))) {
-              e.preventDefault();
-
-              // Check if image div already exists
-              var nextSibling = target.nextSibling;
-              if (nextSibling && nextSibling.classList && nextSibling.classList.contains('injected-img')) {
-                // If the image div already exists, remove it (toggle behavior)
-                nextSibling.remove();
-              } else {
-                // Otherwise, create the image div and insert it after the link
-                var div = document.createElement('div');
-                div.classList.add('injected-img');
-                div.style.margin = '10px 0';
-                div.innerHTML = '<img src="' + href + '" style="max-width: 100%;">';
-                target.parentNode.insertBefore(div, target.nextSibling);
-              }
-            }
-          }
-        });
-
-        // Plugin to display footnotes inline on hover
         markdownSection.addEventListener('mouseover', function(e) {
           var target = e.target;
-          if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:')) {
-            var footnoteId = target.firstChild.hash.substring(1);
+          if (target.tagName === 'A' && target.hash.startsWith('#fn:')) {
+            // Get footnote content
+            var footnoteId = target.hash.substring(1);
             var footnoteContentElement = document.getElementById(footnoteId);
-            if (footnoteContentElement) {
+            if(footnoteContentElement) {
               var footnoteContent = footnoteContentElement.innerHTML;
-              footnote = document.createElement('span');
-              footnote.style.padding = '5px';
-              footnote.style.background = '#f9f9f9';
-              footnote.style.borderRadius = '5px';
-              footnote.style.border = '1px solid #ddd';
-              footnote.innerHTML = footnoteContent;
-              target.appendChild(footnote);
+
+              // Create popup
+              popup = document.createElement('div');
+              popup.style.position = 'fixed';
+              popup.style.left = e.clientX + 'px';
+              popup.style.top = (e.clientY + 10) + 'px';
+              popup.style.background = '#fff';
+              popup.style.padding = '10px';
+              popup.style.maxWidth = '300px';
+              popup.style.border = '1px solid #000';
+              popup.style.zIndex = '1000';
+              popup.innerHTML = footnoteContent;
+
+              // Add popup to body
+              document.body.appendChild(popup);
             }
           }
         });
 
         markdownSection.addEventListener('mouseout', function(e) {
           var target = e.target;
-          if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:') && footnote) {
-            target.removeChild(footnote);
-            footnote = null;
+          if (target.tagName === 'A' && target.hash.startsWith('#fn:') && popup) {
+            // Remove popup from body
+            document.body.removeChild(popup);
+            popup = null;
           }
         });
       });
@@ -112,5 +94,6 @@
   <script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
   <!-- plugins -->
   <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
+
 </body>
 </html>
