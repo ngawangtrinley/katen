@@ -76,7 +76,7 @@
         });
 
         // Footnote Tooltip Plugin
-        markdownSection.addEventListener('mouseenter', function(e) {
+        markdownSection.addEventListener('mouseover', function(e) {
           var target = e.target;
           if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:')) {
             // Get footnote content
@@ -101,7 +101,7 @@
           }
         });
 
-        markdownSection.addEventListener('mouseleave', function(e) {
+        markdownSection.addEventListener('mouseout', function(e) {
           var target = e.target;
           if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:') && popup) {
             // Remove popup from body
