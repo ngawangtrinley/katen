@@ -46,6 +46,7 @@
     window.$docsify.plugins = [].concat(function (hook, vm) {
       hook.doneEach(function() {
         var markdownSection = document.querySelector('.markdown-section');
+        var footnote = null;
 
         // Plugin to display images in the page content when clicking on the link
         markdownSection.addEventListener('click', function(e) {
@@ -81,8 +82,22 @@
             var footnoteContentElement = document.getElementById(footnoteId);
             if (footnoteContentElement) {
               var footnoteContent = footnoteContentElement.innerHTML;
-              target.setAttribute('title', footnoteContent);
+              footnote = document.createElement('span');
+              footnote.style.padding = '5px';
+              footnote.style.background = '#f9f9f9';
+              footnote.style.borderRadius = '5px';
+              footnote.style.border = '1px solid #ddd';
+              footnote.innerHTML = footnoteContent;
+              target.appendChild(footnote);
             }
+          }
+        });
+
+        markdownSection.addEventListener('mouseout', function(e) {
+          var target = e.target;
+          if (target.tagName === 'SUP' && target.firstChild.tagName === 'A' && target.firstChild.hash.startsWith('#fn:') && footnote) {
+            target.removeChild(footnote);
+            footnote = null;
           }
         });
       });
